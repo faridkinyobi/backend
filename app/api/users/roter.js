@@ -8,7 +8,7 @@ import {
 } from "./controler.js";
 const router = express.Router();
 
-router.get('/api/user', getUser);
+router.get('/user', getUser);
 router.get('/user/:id',getUserById);
 router.patch('/user/:id',updateUser);
 router.post('/users', createUser);

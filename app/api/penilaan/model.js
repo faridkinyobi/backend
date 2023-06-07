@@ -1,8 +1,9 @@
-import {Sequelize} from 'sequelize'
-import db from '../../config/db_config.js'
-const {DataTypes} = Sequelize
+import {Sequelize} from "sequelize";
+import db from "../../../config/db_config.js"
 
-const User = db.define('users',{
+const {DataTypes}= Sequelize;
+
+const Pesan = db.define('Penilaan',{
     uuid:{
         type:DataTypes.STRING,
         defaultValue: DataTypes.UUDV4,
@@ -19,23 +20,23 @@ const User = db.define('users',{
             len: [4,100]
         }
     },
-    email:{
+    img:{
+        type: DataTypes.STRING
+    },
+    url:{
+        type: DataTypes.STRING
+    },
+    pesan:{
         type:DataTypes.STRING,
         allowNull:false,
         validate:{
             notEmpty:true,  // nilai tidak boleh nul 
-            isEmail: true
+            len: [4,100]
         }
-    },
-    password:{
-        type:DataTypes.STRING,
-        allowNull:false,
-        validate:{
-            notEmpty:true  // nilai tidak boleh nul 
-        }
-    }    
+    }
+    
 },{
     freezeTableName:true
 });
 
-export default User;
+export default Pesan;
