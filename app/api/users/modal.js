@@ -8,7 +8,7 @@ const User = db.define('users',{
         defaultValue: DataTypes.UUIDV4,
         allowNull: false,
         primaryKey: true,
-    },  
+    },    
     name:{
         type:DataTypes.STRING,
         allowNull:false,
@@ -31,7 +31,7 @@ const User = db.define('users',{
         validate:{
             notEmpty:true  // nilai tidak boleh nul 
         }
-    }    
+    }
 },{
     freezeTableName:true
 });
