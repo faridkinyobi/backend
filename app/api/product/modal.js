@@ -3,7 +3,13 @@ import db from "../../../config/db_config.js";
 
 const {DataTypes}= Sequelize;
 
-const Prodact = db.define('Prodact',{  
+const Prodact = db.define('Prodact',{
+    id: {
+        type: DataTypes.CHAR(36),
+        defaultValue: DataTypes.UUIDV4,
+        allowNull: false,
+        primaryKey: true,
+    }, 
     name:{
         type:DataTypes.STRING,
         allowNull:false,

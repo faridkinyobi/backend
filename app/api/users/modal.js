@@ -3,14 +3,12 @@ import db from '../../../config/db_config.js'
 const {DataTypes} = Sequelize
 
 const User = db.define('users',{
-    uuid:{
-        type:DataTypes.STRING,
-        defaultValue: DataTypes.UUDV4,
-        allowNull:false,
-        validate:{
-            notEmpty:true  // nilai tidak boleh nul dan mty sring
-        }
-    },    
+    id: {
+        type: DataTypes.CHAR(36),
+        defaultValue: DataTypes.UUIDV4,
+        allowNull: false,
+        primaryKey: true,
+    },  
     name:{
         type:DataTypes.STRING,
         allowNull:false,

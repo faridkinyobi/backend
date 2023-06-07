@@ -1,6 +1,6 @@
 
 import Prodact from "./modal.js"
-
+import fs from 'fs'
 
 export const getProduct = async  (req , res) =>{
     try {
@@ -42,66 +42,72 @@ export const createProduct = async (req, res) => {
     res.status(500).json({ success: false, message: 'Failed to create product', error });
   }
 };
-// export const createProduct  = async (req , res) =>{
-//   // console.log(req.file.filename)
-//         // if(!req.file)return res.status(400).json({msg:"no file uploaded"})
-
-//         // // // Mendapatkan data dari permintaan (request)
-//         const { name, harga, jenis } = req.body;
-//         // // const Img = req.file.path
-//         try {
-//           // Membuat produk baru menggunakan metode create pada model Product
-//           const newProduk = await Product.create({
-//             name: name,
-//             harga: harga,
-//             jenis: jenis
-//           });
-//           // Mengirimkan respons dengan produk yang baru dibuat
-//           res.status(201).json({
-//             msg: "product created Success",
-//             data:newProduk
-//           })
-//         } catch (error) {
-//           // Menangani kesalahan jika terjadi
-//           // res.status(404).json({ 
-//             console.log(error.message)
-//           // });
-//         }   
-
-//     // if(req.files==null)return res.status(400).json({msg:"no file uploaded"})
-
-//     // const name = req.body;
-//     // const harga = req.body;
-//     // const jenis = req.body;
-//     // const file = req.files.file;
-//     // const fileSize = file.data.length;
-//     // const ext = path.extname(file.name);//extends
-//     // const fileName = file.md5 + ext; //nama file di conver md5
-//     // const url =`${req.protocol}://${req.get("host")}/image/${fileName}`;
-//     // const allowedType =['.png','.jpg','.jpeg']
 
 
-//     // file.mv(`../../public/image/${fileName}`, async(err)=>{
-//     //     if(err)return res.status(500).json({msg:err.message});
+export const updateProduct = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { name, harga, jenis } = req.body;
+    const { foto } = check;
 
-//     //     try {
-//     //         await Prodak.create({
-//     //             name:name,
-//     //             Img:fileName,
-//     //             url:url,
-//     //             harga:harga,
-//     //             jenis:jenis,
-//     //         });
-//     //         res.status(201).json({msg: "product created Success"})
-//     //     } catch (error) {
-//     //         console.log(error.message)
-//     //     }
-//     // })
-// }
+    // Cari data produk berdasarkan ID
+    const check = await Prodact.findByPk(id)
+    if (!check) {
+      throw new Error("Produk tidak ditemukan");
+    }
 
-export const updateProduct  = (req , res) =>{
-    
-}
-export const deleteProduct  = (req , res) =>{
-    
-}
+    if (foto) {
+      deleteImage(foto);
+    }
+
+    // Perbarui nama, harga, jenis, dan gambar produk
+    const result = await Prodact.update(
+      { name, harga, jenis, foto: req.file.path },
+      { where: { id } }
+    );
+
+    res.status(200).json({ message: "Produk berhasil diperbarui", result });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Terjadi kesalahan saat memperbarui kategori" });
+  }
+};
+
+export const deleteImage = (filePath) => {
+  fs.unlink(filePath, (error) => {
+    if (error) {
+      console.error('Terjadi kesalahan saat menghapus gambar:', error);
+    } else {
+      console.log('Gambar berhasil dihapus');
+    }
+  });
+};
+
+export const deleteProduct = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Cari data produk berdasarkan ID
+    const product = await Prodact.findByPk(id);
+    if (!product) {
+      throw new Error('Produk tidak ditemukan');
+    }
+
+    const { foto } = product;
+
+    // Hapus gambar terlebih dahulu
+    if (foto) {
+      deleteImage(foto);
+    }
+
+    // Hapus data produk dari database
+    await Prodact.destroy({
+      where: { id },
+    });
+
+    res.status(200).json({ message: 'Produk berhasil dihapus' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Terjadi kesalahan saat menghapus produk' });
+  }
+};
