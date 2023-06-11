@@ -1,20 +1,20 @@
 import express  from "express";
 
 import {
-    getPenilaan,
-    getPenilaanById,
-    deletePenilaan,
-    updatePenilaan,
-    createPenilaan
+    getSaran,
+    getSaranById,
+    deleteSaran,
+    updateSaran,
+    createSaran
 } from "./controller.js";
 
 
 const router = express.Router();
 
-router.get('/penilaan', getPenilaan);
-router.get('/penilaan/:id',getPenilaanById);
-router.patch('/penilaan/:id',updatePenilaan)
-router.post('/penilaan', createPenilaan)
-router.delete('/penilaan/:id',deletePenilaan)
+router.get('/saran', getSaran);
+router.get('/saran/:id',getSaranById);
+router.patch('/saran/:id',updateSaran)
+router.post('/saran', createSaran)
+router.delete('/saran/:id',deleteSaran)
 
 export default router ;

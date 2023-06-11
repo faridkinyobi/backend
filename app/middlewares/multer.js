@@ -4,10 +4,10 @@ import path from 'path'
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
       // import asas frim "../../public/image"
-    cb(null, './public/foto');
+    cb(null, 'public/foto');
     },
     filename: function (req, file, cb) {
-      cb(null, Math.floor(Math.random() * 99999999) + '-' + file.originalname);
+      cb(null, Math.floor(Math.random() * 99999999)+'-'+ file.originalname);
     },
     });
     const fileFilter = (req, file, cb) => {
@@ -26,7 +26,7 @@ const storage = multer.diskStorage({
 const uploadMiddleware = multer({
     storage,
     limits: {
-      fileSize: 2 * 238 * 225, // Batasan ukuran file dalam byte (misalnya, 5MB)
+      fileSize: 2 * 290 * 290, // Batasan ukuran file dalam byte (misalnya, 5MB)
     },
     fileFilter:fileFilter
   });
