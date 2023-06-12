@@ -31,6 +31,9 @@ const User = db.define('users',{
         validate:{
             notEmpty:true  // nilai tidak boleh nul 
         }
+    },
+    refreshToken: {
+        type:DataTypes.STRING,
     }
 },{
     freezeTableName:true
