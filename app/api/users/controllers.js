@@ -1,7 +1,7 @@
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
 import UserModal from "./modal.js"
-// import User from './modal.js'
+import responseBody from "../../helpers/responseBody.js";
 
 export const getUser = async (req , res) =>{
     try {
@@ -32,13 +32,9 @@ export const updateUser  = async (req , res) => {
             throw Error();
         }
 
-        res.status(200).json({
-            status: 'success', message: 'user berhasil diperbarui'
-        });
+        responseBody(200, 'succes', { message:  'user berhasil diperbarui'}, res);
     } catch(e) {
-        res.status(404).json({
-            status: 'fail', message: 'user not found'
-        });
+        responseBody(404, 'fail', { message: 'user not found' }, res);
     }
 }
 
@@ -51,13 +47,9 @@ export const deleteUser  = async (req , res) => {
             throw Error();
         }
 
-        res.status(200).json({
-            status: 'success', message: 'user berhasil dihapus'
-        });
+        responseBody(200, 'success', { message: 'user berhasil dihapus' }, res);
     } catch(e) {
-        res.status(404).json({
-            status: 'fail', message: 'user not found'
-        });
+        responseBody(404, 'fail', { message: 'user not found' }, res);
     }
 }
 
@@ -69,9 +61,7 @@ export const register = async (req, res) => {
         const duplicateName = user.find((user) => user.name === name)
 
         if (duplicateName) {
-            res.status(409).json({
-                status: 'fail', message: 'name duplicate'
-            })
+            responseBody(409, 'fail', { message: 'nama duplikat atau sudah ada' }, res);
         } else {
             const hashPaswword = await bcrypt.hash(password, 10);
 
@@ -81,14 +71,10 @@ export const register = async (req, res) => {
                 password: hashPaswword
             })
 
-            res.status(201).json({
-                status: 'success', message: 'register successfully', data: { id: result.dataValues.id }
-            })
+            responseBody(201, 'success', { message: 'register berhasil', data: { id: result.dataValues.id }}, res);
         }
     } catch (e) {
-        res.status(400).json({
-            status: 'fail', message: `${e.name}: ${e.message}`
-        })
+        responseBody(400, 'fail', { message: `${e.name}: ${e.message}` }, res);
     }
 }
 
@@ -100,13 +86,13 @@ const generateAccesToken = (name) => {
 export const tokenHandler = async (req, res) => {
     const cookies = req.cookies;
     
-    if (!cookies?.jwt) return res.sendStatus(401);
+    if (!cookies?.jwt) return responseBody(401, 'fail', { message: 'User Unauthorized' }, res);
     const refreshToken = cookies.jwt;
     
     const foundUser = await UserModal.findOne({ where: { refreshToken } });
     const user = foundUser.dataValues;
 
-    if (!user) return res.sendStatus(403);
+    if (!user) return responseBody(403, 'fail', { message: 'Forbidden for user' }, res);
 
     try {
         jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, user) => {
@@ -116,7 +102,7 @@ export const tokenHandler = async (req, res) => {
             res.json({ accessToken });
         });
     } catch(e) {
-        return res.sendStatus(403);
+        responseBody(403, 'fail', { message: 'Forbidden for user' }, res);
     }
 }
 
@@ -131,13 +117,11 @@ export const loginAuth = async (req, res) => {
         const user = foundUser.dataValues;
         
         if (!user) {
-            res.status(401).json({
-                status: 'fail', message: 'user not found'
-            })
+            return responseBody(401, 'fail', { message: 'User Unauthorized' }, res);
         }
 
         const match = await bcrypt.compare(password, user.password);
-
+        
         if (match) {
             const username = { name: user.name };
             const accessToken = generateAccesToken(username);
@@ -146,18 +130,12 @@ export const loginAuth = async (req, res) => {
             await UserModal.update({ refreshToken }, { where: { name: user.name } });
 
             res.cookie('jwt', refreshToken, { httpOnly: true, sameSite: 'None' });
-            res.status(200).json({
-                status: 'success', accessToken
-            })
+            responseBody(200, 'success', { data: { accessToken } }, res);
         } else {
-            res.status(401).json({
-                status: 'fail', message: 'user not found'
-            })
+            responseBody(401, 'success', { message: 'User Unauthorized' }, res);
         }
     } catch(e) {
-        res.status(404).json({
-            status: 'fail', message: 'user not found!'
-        })
+        responseBody(404, 'fail', { message: 'user tidak ditemukan' }, res);
     }
 }
 
@@ -180,6 +158,6 @@ export const logoutHandler = async (req, res) => {
         res.clearCookie('jwt', { httpOnly: true, sameSite: 'None' });
         res.sendStatus(204);
     } catch(e) {
-        res.json({ message: `${e.name}: ${e.message}` });
+        responseBody(404, 'fail', { message: 'User tidak ditemukan!' }, res);
     }
 }

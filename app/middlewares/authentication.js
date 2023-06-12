@@ -1,4 +1,5 @@
 import jwt from 'jsonwebtoken'
+import responseBody from '../helpers/responseBody.js';
 
 const authentication = (req, res, next) => {
   try {
@@ -13,9 +14,7 @@ const authentication = (req, res, next) => {
       next()
     })
   } catch(e) {
-    res.status(403).json({
-      status: 'fail', message: `${e.name}: ${e.message}`
-    })
+    responseBody(403, 'fail', { message: `${e.message}` }, res);
   }
 }
 

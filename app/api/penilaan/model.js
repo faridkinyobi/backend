@@ -3,35 +3,43 @@ import db from "../../../config/db_config.js"
 
 const {DataTypes}= Sequelize;
 
-const Pesan = db.define('Penilaan',{
-    uuid:{
-        type:DataTypes.STRING,
-        defaultValue: DataTypes.UUDV4,
-        allowNull:false,
-        validate:{
-            notEmpty:true  // nilai tidak boleh nul dan mty sring
-        }
+const Saran = db.define('Saran',{
+    id: {
+        type: DataTypes.CHAR(36),
+        defaultValue: DataTypes.UUIDV4,
+        allowNull: false,
+        primaryKey: true,
     },    
     name:{
         type:DataTypes.STRING,
         allowNull:false,
         validate:{
             notEmpty:true,  // nilai tidak boleh nul 
-            len: [4,100]
+            len: [2,100]
         }
     },
-    img:{
-        type: DataTypes.STRING
+    email:{
+        type:DataTypes.STRING,
+        allowNull:false,
+        validate:{
+            notEmpty:true,  // nilai tidak boleh nul 
+            isEmail: true
+        }
     },
-    url:{
-        type: DataTypes.STRING
+    alamat:{
+        type:DataTypes.STRING,
+        allowNull:false,
+        validate:{
+            notEmpty:true,  // nilai tidak boleh nul 
+            len: [2,100]
+        }
     },
     pesan:{
         type:DataTypes.STRING,
         allowNull:false,
         validate:{
             notEmpty:true,  // nilai tidak boleh nul 
-            len: [4,100]
+            len: [2,100]
         }
     }
     
@@ -39,4 +47,7 @@ const Pesan = db.define('Penilaan',{
     freezeTableName:true
 });
 
-export default Pesan;
+export default Saran;
+(async()=>{
+    await db.sync();
+})
