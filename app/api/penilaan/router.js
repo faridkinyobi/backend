@@ -15,6 +15,6 @@ router.get('/saran', getSaran);
 router.get('/saran/:id',getSaranById);
 router.patch('/saran/:id',updateSaran)
 router.post('/saran', createSaran)
-router.delete('/saran/:id',deleteSaran)
+router.delete('/saran/:name',deleteSaran)
 
 export default router ;

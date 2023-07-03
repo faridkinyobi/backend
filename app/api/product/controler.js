@@ -1,8 +1,8 @@
 
-
-import { response } from "express";
 import Prodact from "./modal.js"
 import fs from 'fs';
+import responseBody from "../../helpers/responseBody.js";
+
 
 export const getProduct = async  (req , res, next) =>{
     try {
@@ -37,8 +37,11 @@ export const createProduct = async (req, res, next) => {
   try {
     if(!req.file) return res.status(400).json({msg:"no file"})
     const { name, harga, jenis} = req.body
-    
-    console.log(req.file)
+    const produc = await Prodact.findAll()
+    const duplicateName = produc.find((produc) => produc.name === name || produc.foto === foto);
+    if(duplicateName){
+      responseBody(409, "Conflict", { message: "nama sudah ada!" }, res);
+    }
     // Buat produk baru menggunakan model Product
     const product = await Prodact.create({
       name,
@@ -58,13 +61,15 @@ export const updateProduct = async (req, res) => {
   try {
     const   {id} =req.params
     const {name,jenis,harga} =req.body
+    
+
     const product = await Prodact.findOne({
         where:{
           id:id
         }    
     });
     if(!product){
-      throw new Error(`Tidak ada Kategori dengan id : ${id}`)
+      responseBody(409, "Conflict", { message: `Tidak ada Kategori dengan id : ${id}` }, res);
     }
     const { foto} = product
     if(foto){
@@ -78,12 +83,16 @@ export const updateProduct = async (req, res) => {
         foto: req.file.path },
       { where: { id:id } 
     })
+    const duplicateName = result.find((result) => result.name === name || result.foto === foto);
+    if(duplicateName){
+      responseBody(409, "Conflict", { message: "nama sudah ada!" }, res);
+    }
     res.status(200).json({
       data:result,
       message: "Produk berhasil diperbarui", 
       });
   } catch (error) {
-    next(error)
+    console.log(error)
   }
 }
 export const deleteImage = (filename) => {

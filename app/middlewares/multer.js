@@ -7,7 +7,7 @@ const storage = multer.diskStorage({
     cb(null, 'public/foto');
     },
     filename: function (req, file, cb) {
-      cb(null, Math.floor(Math.random() * 99999999)+'-'+ file.originalname);
+      cb(null, file.originalname);
     },
     });
     const fileFilter = (req, file, cb) => {

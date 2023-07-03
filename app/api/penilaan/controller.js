@@ -10,7 +10,7 @@ export const getSaran = async(req , res, next) =>{
         next(error)
     }
 }
-export const getSaranById = async(req , res, next) => {
+export const getSaranById = async(req , res) => {
     try {
         const {id} =req.params
         const penilaan = await Saran.findOne({
@@ -22,27 +22,26 @@ export const getSaranById = async(req , res, next) => {
             data:penilaan
         });
     } catch (error) {
-        next(error)
+        console.log(error)
     }
 }
-export const createSaran  = async(req , res,next) =>{
+export const createSaran  = async(req , res) =>{
     try {
         console.log(req.body)
         const { name, email ,alamat,pesan }= req.body
-        const saran = await Saran.create({
+         await Saran.create({
             name,email,alamat,pesan
         });
         res.status(200).json({
-            data:saran,
             status:true,
             message: 'Product created successfully'
         })
     } catch (error) {
-        next(error)  
+        console.log(error)
     }
 }
 
-export const updateSaran  = async(req , res, next) =>{
+export const updateSaran  = async(req , res) =>{
     try {
         const   {id} =req.params
         const { name, email ,alamat,pesan }= req.body
@@ -67,7 +66,7 @@ export const updateSaran  = async(req , res, next) =>{
             message: 'successfully'
         })
     } catch (error) {
-        next(error)
+        console.log(error)
     }
 }
 export const deleteSaran = async(req , res) =>{
@@ -78,9 +77,9 @@ export const deleteSaran = async(req , res) =>{
                 id:id
             }
         })
-        if(!saran){
-            throw new Error(`Tidak ada Kategori dengan id : ${id}`)
-        }
+        // if(!saran){
+        //     throw new Error(`Tidak ada Kategori dengan id : ${id}`)
+        // }
         await saran.destroy({
             where: { id },
         });
@@ -89,7 +88,7 @@ export const deleteSaran = async(req , res) =>{
             message: 'Produk berhasil dihapus'
         })
     } catch (error) {
-        next(error)
+        console.log(error)
         
     }
 }
