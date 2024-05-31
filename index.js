@@ -1,33 +1,34 @@
-import express  from 'express';
-import cors from  'cors'
-import dotenv from 'dotenv'
-import cookieParser from 'cookie-parser';
-import path from 'path'
-import db_confiq from   './config/db_config.js'
-import UserRout from './app/api/users/router.js'
-import ProdactRout from './app/api/product/router.js'
-import PenilaanctRout from './app/api/penilaan/router.js'
-import authentication from './app/middlewares/authentication.js';
+const express = require('express');
+const cors = require('cors');
+const dotenv = require('dotenv');
+const morgan = require('morgan');
+const cookieParser = require('cookie-parser');
+const {db}  = require('./db_config.js');
+const UserRout = require('./app/api/users/router');
+const ProdactRout = require('./app/api/product/router.js');
+const PenilaanctRout = require('./app/api/penilaan/router');
+const bodyParser = require('body-parser');
+    try {
+         db.authenticate()  
+            db.sync().then(()=>console.log('data base ready'))
+        } catch (error) {
+            // console.log(error)
+        }
 
-db_confiq.sync().then(()=>console.log('data base ready'))
+dotenv.config();
 
-dotenv.config()
-
-const app = express()
-
+const app = express();
 app.use(express.static("public"));
-
-app.use(cookieParser());
-app.use(cors())
+app.use(bodyParser.json());
+app.use(cors());
 app.use(express.json());
+app.use(cookieParser());
+app.use(morgan("dev"));
 
-app.use(UserRout)
+// Mount routers at specific paths
+app.use(UserRout.router);
+app.use(ProdactRout.router);
+app.use(PenilaanctRout.router);
 
-// middleware authentication
-app.use(authentication)
-
-app.use(ProdactRout)
-app.use(PenilaanctRout)
-
-const port = 5000
-app.listen(port,()=>console.log(`running server on port ${port}`))
+const port = 5000;
+app.listen(port, () => console.log(`running server on port ${port}`));

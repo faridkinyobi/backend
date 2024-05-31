@@ -1,7 +1,6 @@
-import {Sequelize} from "sequelize";
-import db from "../../../config/db_config.js"
+const {DataTypes} = require('sequelize');
 
-const {DataTypes}= Sequelize;
+const { db } = require('../../../../db_config.js');
 
 const Saran = db.define('Saran',{
     id: {
@@ -41,13 +40,17 @@ const Saran = db.define('Saran',{
             notEmpty:true,  // nilai tidak boleh nul 
             len: [2,100]
         }
-    }
-    
+    },
+    status:{
+        type:DataTypes.BOOLEAN,
+        },
 },{
     freezeTableName:true
 });
 
-export default Saran;
-(async()=>{
-    await db.sync();
-})
+module.exports={
+    Saran
+}
+// (async()=>{
+//     await db.sync();
+// })

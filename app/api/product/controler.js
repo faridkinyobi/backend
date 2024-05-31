@@ -1,120 +1,143 @@
+const {Prodact} =require("./modal.js")
+const fs =require("fs");
+const {responseBody} =require("../../helpers/responseBody.js");
 
-import Prodact from "./modal.js"
-import fs from 'fs';
-import responseBody from "../../helpers/responseBody.js";
-
-
-export const getProduct = async  (req , res, next) =>{
-    try {
-        const respon = await Prodact.findAll();
-        res.status(201).json({ 
-          data:respon
-        });
-    } catch (error) {
-      next(error)
+const getProduct = async (req, res) => {
+  try {
+    const respon = await Prodact.findAll();
+    res.status(201).json({
+      data: respon,
+    });
+  } catch (e) {
+    responseBody(400, "fail", { message: "invalid" }, res);
+  }
+};
+ const getProductById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const respon = await Prodact.findOne({
+      where: {
+        id: id,
+      },
+    });
+    if (!respon) {
+      throw new Error(`Tidak ada Kategori dengan id :  ${id}`);
+    }
+    res.status(200).json({
+      data: respon,
+    });
+  } catch (e) {
+    responseBody(400, "fail", { message: "invalid" }, res);
+  }
+};
+ const createProduct = async (req, res) => {
+  try {
+    if (!req.file) {
+      return responseBody(400, "fail", { message: "no file" }, res);
     }
     
-}
-export const getProductById = async (req , res, next) =>{
-    try {
-        const {id} =req.params
-        const respon = await Prodact.findOne({
-            where:{
-              id:id,
-            }    
-        });
-        if (!respon) {
-          throw new Error(`Tidak ada Kategori dengan id :  ${id}`);
-        }
-        res.status(200).json({
-          data:respon,
-      });
-    } catch (error) {
-        next(error)
-    }
-}
-export const createProduct = async (req, res, next) => {
-  try {
-    if(!req.file) return res.status(400).json({msg:"no file"})
-    const { name, harga, jenis} = req.body
-    const produc = await Prodact.findAll()
-    const duplicateName = produc.find((produc) => produc.name === name || produc.foto === foto);
-    if(duplicateName){
-      responseBody(409, "Conflict", { message: "nama sudah ada!" }, res);
+    const { name, harga, jenis } = req.body;
+    const produc = await Prodact.findAll();
+    const duplicateName = produc.find((produc) => produc.name === name);
+    if (duplicateName) {
+      return responseBody(409, "Conflict", { message: "nama sudah ada!" }, res);
     }
     // Buat produk baru menggunakan model Product
     const product = await Prodact.create({
-      name,
+      name, 
       harga,
       jenis,
-      foto: req.file.filename.replace(/\\/g, '/')
+      foto: req.file.filename.replace(/\\/g, "/"),
     });
-    res.status(201).json({ 
-      date:product,
-      status:true,
-      message: 'Product created successfully'});
-  } catch (error) {
-    next(error)
+    responseBody(200, "success", { message: "Created successfully" }, res);
+  } catch (e) {
+    responseBody(400, "fail", { message: `${e.name}: ${e.message}` }, res);
   }
-}
-export const updateProduct = async (req, res) => {
+};
+ const updateProduct = async (req, res) => {
   try {
-    const   {id} =req.params
-    const {name,jenis,harga} =req.body
-    
+    const { id } = req.params;
+    const { name, jenis, harga } = req.body;
 
     const product = await Prodact.findOne({
-        where:{
-          id:id
-        }    
+      where: {
+        id: id,
+      },
     });
-    if(!product){
-      responseBody(409, "Conflict", { message: `Tidak ada Kategori dengan id : ${id}` }, res);
+    if (!product) {
+      responseBody(
+        409,
+        "Conflict",
+        { message: `Tidak ada Kategori dengan id : ${id}` },
+        res
+      );
     }
-    const { foto} = product
-    if(foto){
-      deleteImage(foto)
+    const { foto } = product;
+    if (req.file) {
+      if (foto) {
+        deleteImage(foto);
+      }
+      // Perbarui nama, harga, jenis, dan gambar produk
+      const result = await Prodact.update(
+        {
+          name,
+          harga,
+          jenis,
+          foto: req.file.filename.replace(/\\/g, "/"),
+          // foto: req.file.path
+        },
+        { where: { id: id } }
+      );
+      const duplicateName = result.find((result) => result.name === name);
+      if (duplicateName) {
+        responseBody(409, "Conflict", { message: "nama sudah ada!" }, res);
+      }
+    } else {
+      const result = await Prodact.update(
+        {
+          name,
+          harga,
+          jenis,
+        },
+        {
+          where: { id: id },
+        }
+      );
+      const duplicateName = result.find((result) => result.name === name);
+      if (duplicateName) {
+        responseBody(409, "Conflict", { message: "nama sudah ada!" }, res);
+      }
     }
-    // Perbarui nama, harga, jenis, dan gambar produk
-    const result = await Prodact.update(
-      { name,
-        harga, 
-        jenis, 
-        foto: req.file.path },
-      { where: { id:id } 
-    })
-    const duplicateName = result.find((result) => result.name === name || result.foto === foto);
-    if(duplicateName){
-      responseBody(409, "Conflict", { message: "nama sudah ada!" }, res);
-    }
-    res.status(200).json({
-      data:result,
-      message: "Produk berhasil diperbarui", 
-      });
-  } catch (error) {
-    console.log(error)
+    responseBody(200, "success", { message: "Update successfully" }, res);
+  } catch (e) {
+    responseBody(404, "fail", { message: "not found" }, res);
   }
-}
-export const deleteImage = (filename) => {
-  // variabl nama file
-  const filePath = `${filename}`;
-  
-  // Hapus file dengan menggunakan fs.unlink
-  fs.unlink(filePath, (err) => {
-    if (err) {
-      console.error(err);
-      return;
-    }
-  });
 };
-export const deleteProduct = async (req, res, next) => {
+ const deleteImage = (filename) => {
+ 
+  try {
+    // Variabel nama file
+    const filePath = `public/foto/${filename}`;
+
+    // Hapus file menggunakan fs.promises.unlink
+    fs.unlink(filePath, (err) => {
+      if (err) {    
+        res.status(400).error(err);
+        return; 
+      }
+    });
+  } catch (err) {
+    throw new Error(`Gagal menghapus gambar: ${err.message}`);
+  }
+};
+ const deleteProduct = async (req, res) => {
   try {
     const { id } = req.params;
 
     // Cari data produk berdasarkan ID
     const product = await Prodact.findByPk(id);
-    if(!product){
-      throw new Error(`Tidak ada Kategori dengan id : ${id}`)
+    if (!product) {
+      throw new Error(`Tidak ada Kategori dengan id : ${id}`);
     }
 
     const { foto } = product;
@@ -127,10 +150,16 @@ export const deleteProduct = async (req, res, next) => {
     await Prodact.destroy({
       where: { id },
     });
-    res.status(200).json({ 
-      status:true,
-      message: 'Produk berhasil dihapus' });
-  } catch (error) {
-    next(error)
+    responseBody(200, "success", { message: "Delete successfully" }, res);
+  } catch (e) {
+    responseBody(404, "fail", { message: "not found" }, res);
   }
 };
+module.exports={
+  getProduct,
+  getProductById,
+  createProduct,
+  updateProduct,
+  deleteImage,
+  deleteProduct,
+}

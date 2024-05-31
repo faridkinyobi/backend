@@ -1,8 +1,7 @@
-import {Sequelize} from 'sequelize'
-import db from '../../../config/db_config.js'
-const {DataTypes} = Sequelize
+const {DataTypes} = require('sequelize')
+const {db} = require("../../../../db_config.js")
 
-const User = db.define('users',{
+const UserModal = db.define('users',{
     id: {
         type: DataTypes.CHAR(36),
         defaultValue: DataTypes.UUIDV4,
@@ -33,10 +32,15 @@ const User = db.define('users',{
         }
     },
     refreshToken: {
-        type:DataTypes.STRING,
+        type:DataTypes.TEXT
     }
 },{
     freezeTableName:true
 });
 
-export default User;
+module.exports={
+    UserModal
+}
+// (async()=>{
+//     await db.sync();
+// })

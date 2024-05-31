@@ -1,5 +1,5 @@
-import multer from 'multer';
-import path from 'path'
+const multer = require('multer')
+const path = require('path')
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -9,7 +9,7 @@ const storage = multer.diskStorage({
     filename: function (req, file, cb) {
       cb(null, file.originalname);
     },
-    });
+    })
     const fileFilter = (req, file, cb) => {
         if (file.mimetype === 'image/jpeg' || file.mimetype === 'image/png' || file.mimetype === 'image/jpg') {
             cb(null, true);
@@ -26,9 +26,11 @@ const storage = multer.diskStorage({
 const uploadMiddleware = multer({
     storage,
     limits: {
-      fileSize: 2 * 290 * 290, // Batasan ukuran file dalam byte (misalnya, 5MB)
+     fileSize: 1024*1024  // Batasan ukuran file dalam byte (misalnya, 5MB)
     },
     fileFilter:fileFilter
-  });
+  }).single('foto');
 
-export default uploadMiddleware
+module.exports={
+  uploadMiddleware
+}

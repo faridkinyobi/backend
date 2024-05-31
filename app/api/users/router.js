@@ -1,32 +1,29 @@
-import express from 'express'
-import authentication from '../../middlewares/authentication.js'
-import {
+const express = require('express');
+const  {authentication} =require('../../middlewares/authentication')
+
+const {
     getUser,
-    getUserById,
-    createUser,
     register,
     loginAuth,
     updateUser,
     deleteUser,
+    logoutHandler,
     tokenHandler,
-    logoutHandler
-} from "./controllers.js";
+} = require('./controllers.js');
+
 
 
 const router = express.Router();
 
-// belum dipakai
-router.get('/user', getUser);
-router.get('/user/:id',getUserById);
-router.post('/users', createUser);
-// belum dipakai
-
-router.post('/register', register);
-router.post('/login', loginAuth);
-router.get('/token', tokenHandler);
-router.delete('/logout', logoutHandler);
+router.get('/user',authentication,getUser);
+router.post('/register',register);
+router.post('/login',loginAuth);
+router.post('/token',tokenHandler);
+router.delete('/logout',authentication,logoutHandler);
 
 router.patch('/user', authentication, updateUser);
-router.delete('/user', authentication, deleteUser);
+router.delete('/user/:id', authentication,deleteUser);
 
-export default router;
+module.exports={
+    router
+}

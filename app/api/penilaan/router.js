@@ -1,20 +1,24 @@
-import express  from "express";
-
-import {
+const express = require('express');
+const {verifyToken} = require("../../middlewares/verifytoken.js")
+const{
     getSaran,
+    getSaran2,
     getSaranById,
     deleteSaran,
     updateSaran,
     createSaran
-} from "./controller.js";
+} = require("./controller")
 
 
 const router = express.Router();
 
-router.get('/saran', getSaran);
-router.get('/saran/:id',getSaranById);
-router.patch('/saran/:id',updateSaran)
-router.post('/saran', createSaran)
-router.delete('/saran/:name',deleteSaran)
+router.get('/saran',verifyToken, getSaran);
+router.get('/saranHome', getSaran2);
+router.get('/saran/:id',verifyToken,getSaranById);
+router.post('/saran/:id',updateSaran)
+router.post('/saran',createSaran)
+router.delete('/saran/:id',verifyToken,deleteSaran)
 
-export default router ;
+module.exports={
+    router 
+} 

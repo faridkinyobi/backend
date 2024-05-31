@@ -4,4 +4,6 @@ const responseBody = (statusCode, status, { message, data }, res) => res.status(
     data,
   });
 
-export default responseBody;
+module.exports={
+  responseBody
+}
