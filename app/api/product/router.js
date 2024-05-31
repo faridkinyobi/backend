@@ -1,34 +1,24 @@
-import express  from "express";
-import upload from "../../middlewares/multer.js"
-import {
+const express = require('express');
+const {uploadMiddleware} =require("../../middlewares/multer")
+const  {authentication} =require('../../middlewares/authentication')
+
+
+const {
     getProduct,
     getProductById,
     deleteProduct,
     updateProduct,
     createProduct
-} from "./controler.js";
+} =require( "./controler")
 
 
 const router = express.Router();
 
-// import multer from 'multer';
-
-// const storage = multer.diskStorage({
-//     destination: function (req, file, cb) {
-//         cb(null, './public/foto')
-//     },
-//     filename: function (req, file, cb) {
-//         const ext = file.originalname.split('.').pop();
-//         cb(null, `${file.fieldname}-${Date.now()}.${ext}`); // Nama file dengan timestamp
-//     },
-//     });
-
-// const upload= multer({storage:storage});
-
-router.get('/products', getProduct )
+router.get('/products',authentication, getProduct )
+router.get('/product',getProduct )
 router.get('/products/:id',getProductById)
-router.patch('/products/:id',upload.single('foto'),updateProduct)
-router.post('/products',upload.single('foto'), createProduct)
-router.delete('/products/:id',deleteProduct)
+router.patch('/products/:id',uploadMiddleware,authentication,updateProduct)
+router.post('/products',uploadMiddleware,authentication,createProduct)
+router.delete('/products/:id',authentication,deleteProduct)
 
-export default router
+module.exports={router}
